@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>مدير الروابط</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f5f4f0;
+    --surface: #ffffff;
+    --surface2: #f0ede8;
+    --border: rgba(0,0,0,0.10);
+    --border2: rgba(0,0,0,0.18);
+    --text: #1a1a18;
+    --text2: #6b6a66;
+    --text3: #9e9c97;
+    --green: #1D9E75;
+    --green-light: #E1F5EE;
+    --green-mid: #9FE1CB;
+    --green-dark: #0F6E56;
+    --radius: 10px;
+    --radius-lg: 14px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1a1a18;
+      --surface: #242422;
+      --surface2: #2e2e2b;
+      --border: rgba(255,255,255,0.10);
+      --border2: rgba(255,255,255,0.18);
+      --text: #f0ede8;
+      --text2: #a09e99;
+      --text3: #6b6a66;
+      --green-light: #0a2e22;
+      --green-mid: #085041;
+      --green-dark: #9FE1CB;
+    }
+  }
+
+  html, body {
+    height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Cairo', sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  .page { max-width: 700px; margin: 0 auto; padding: 2rem 1rem 4rem; }
+
+  .header { margin-bottom: 1.75rem; }
+  .header-row { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+  .logo-icon {
+    width: 40px; height: 40px;
+    background: var(--text);
+    border-radius: var(--radius);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .logo-icon svg { width: 22px; height: 22px; stroke: var(--bg); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .header h1 { font-size: 22px; font-weight: 700; color: var(--text); }
+  .header p { font-size: 13px; color: var(--text2); margin-right: 50px; }
+
+  .input-card {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem;
+    margin-bottom: 1.5rem;
+  }
+  textarea {
+    width: 100%;
+    min-height: 110px;
+    resize: vertical;
+    background: var(--surface2);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 10px 14px;
+    font-size: 14px;
+    color: var(--text);
+    font-family: 'Cairo', sans-serif;
+    outline: none;
+    transition: border-color 0.2s;
+    direction: auto;
+  }
+  textarea:focus { border-color: var(--border2); }
+  textarea::placeholder { color: var(--text3); }
+
+  .btn-row { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+
+  .btn-primary {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--text); color: var(--bg);
+    border: none; padding: 9px 20px;
+    border-radius: var(--radius); font-size: 13px; font-weight: 600;
+    cursor: pointer; font-family: 'Cairo', sans-serif;
+    transition: opacity 0.15s, transform 0.1s;
+  }
+  .btn-primary:hover { opacity: 0.85; }
+  .btn-primary:active { transform: scale(0.97); }
+
+  .btn-ghost {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: transparent;
+    border: 0.5px solid var(--border2);
+    color: var(--text2); padding: 9px 16px;
+    border-radius: var(--radius); font-size: 13px;
+    cursor: pointer; font-family: 'Cairo', sans-serif;
+    transition: background 0.15s, color 0.15s;
+  }
+  .btn-ghost:hover { background: var(--surface2); color: var(--text); }
+
+  .stats-row {
+    display: flex; gap: 8px; margin-bottom: 1.25rem;
+    flex-wrap: wrap;
+  }
+  .stat-chip {
+    font-size: 12px; padding: 4px 12px;
+    border-radius: 999px;
+    border: 0.5px solid var(--border);
+    color: var(--text2);
+    background: var(--surface);
+  }
+  .stat-chip b { color: var(--text); font-weight: 600; }
+  .stat-chip.green { border-color: var(--green-mid); color: var(--green-dark); background: var(--green-light); }
+  .stat-chip.green b { color: var(--green-dark); }
+
+  .links-list { display: flex; flex-direction: column; gap: 10px; }
+
+  .link-card {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 12px 14px;
+    transition: border-color 0.25s, background 0.25s;
+  }
+  .link-card.used {
+    border-color: var(--green);
+    background: var(--green-light);
+  }
+
+  .card-top { display: flex; align-items: center; gap: 10px; }
+
+  .favicon-wrap {
+    width: 38px; height: 38px; flex-shrink: 0;
+    border-radius: var(--radius);
+    border: 0.5px solid var(--border);
+    background: var(--surface2);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    overflow: hidden;
+    position: relative;
+  }
+  .favicon-wrap:hover { transform: scale(1.07); }
+  .favicon-wrap.used { background: var(--green); border-color: var(--green); }
+  .favicon-wrap img { width: 20px; height: 20px; border-radius: 3px; display: block; }
+  .favicon-wrap .check-icon { display: none; }
+  .favicon-wrap.used .favicon-img { display: none; }
+  .favicon-wrap.used .check-icon { display: flex; align-items: center; justify-content: center; }
+  .favicon-wrap.used .check-icon svg { width: 18px; height: 18px; stroke: white; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+
+  .link-default-icon svg { width: 18px; height: 18px; stroke: var(--text3); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+  .link-info { flex: 1; min-width: 0; }
+  .link-meta { font-size: 11px; color: var(--text3); font-weight: 500; margin-bottom: 1px; }
+  .link-meta.used { color: var(--green-dark); }
+  .link-url-text {
+    font-size: 13px; color: var(--text);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    direction: ltr; text-align: right;
+  }
+  .link-url-text.used { color: var(--green-dark); }
+
+  .btn-delete {
+    background: none; border: none; cursor: pointer;
+    color: var(--text3); padding: 5px;
+    border-radius: var(--radius); font-size: 14px;
+    transition: color 0.15s, background 0.15s;
+    line-height: 1; flex-shrink: 0;
+  }
+  .btn-delete:hover { color: #cc4444; background: rgba(204,68,68,0.08); }
+  .btn-delete svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+  .card-actions {
+    display: flex; gap: 6px; margin-top: 10px;
+    padding-top: 10px;
+    border-top: 0.5px solid var(--border);
+    flex-wrap: wrap; align-items: center;
+  }
+
+  .action-btn {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: transparent;
+    border: 0.5px solid var(--border2);
+    color: var(--text2);
+    padding: 6px 12px;
+    border-radius: var(--radius); font-size: 12px;
+    cursor: pointer; font-family: 'Cairo', sans-serif;
+    transition: all 0.15s; font-weight: 500;
+  }
+  .action-btn svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+  .action-btn:hover { background: var(--surface2); color: var(--text); }
+  .action-btn.copied { border-color: var(--green); color: var(--green-dark); }
+  .action-btn.mark-btn { margin-right: auto; }
+  .action-btn.mark-btn.active { border-color: var(--green); color: var(--green-dark); background: var(--green-light); }
+  .action-btn.mark-btn.active:hover { background: var(--green-mid); }
+
+  .empty-state {
+    text-align: center;
+    padding: 4rem 1rem;
+    color: var(--text3);
+  }
+  .empty-state .empty-icon { margin: 0 auto 14px; opacity: 0.35; }
+  .empty-state .empty-icon svg { width: 52px; height: 52px; stroke: var(--text3); fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+  .empty-state h3 { font-size: 15px; color: var(--text2); margin-bottom: 4px; }
+  .empty-state p { font-size: 13px; }
+
+  .toast {
+    position: fixed; bottom: 24px; left: 50%;
+    transform: translateX(-50%) translateY(70px);
+    background: var(--text); color: var(--bg);
+    padding: 9px 22px; border-radius: 999px;
+    font-size: 13px; font-weight: 500; font-family: 'Cairo', sans-serif;
+    opacity: 0; transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    z-index: 9999; pointer-events: none; white-space: nowrap;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  @media (max-width: 480px) {
+    .page { padding: 1.25rem 0.75rem 3rem; }
+    .header p { margin-right: 0; margin-top: 4px; }
+    .card-actions { gap: 5px; }
+    .action-btn { padding: 5px 10px; font-size: 11px; }
+    .btn-primary, .btn-ghost { padding: 8px 14px; font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <div class="header">
+    <div class="header-row">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+      </div>
+      <h1>مدير الروابط</h1>
+    </div>
+    <p>الصق أي رسالة تحتوي على روابط وسيتم استخراجها تلقائياً</p>
+  </div>
+
+  <div class="input-card">
+    <textarea id="msgInput" placeholder="الصق هنا رسالتك... مثال: شوف هذا الفيديو https://youtube.com/watch?v=abc وهذا الموقع https://example.com"></textarea>
+    <div class="btn-row">
+      <button class="btn-primary" onclick="extractLinks()">
+        <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        استخراج الروابط
+      </button>
+      <button class="btn-ghost" onclick="clearAll()">
+        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+        مسح الكل
+      </button>
+    </div>
+  </div>
+
+  <div id="statsRow" class="stats-row" style="display:none;"></div>
+  <div id="linksList" class="links-list"></div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const STORAGE_KEY = 'link_mgr_v2';
+  let links = [];
+  let toastTimer = null;
+
+  function saveData() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(links)); } catch(e) {}
+  }
+
+  function loadData() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) links = JSON.parse(raw);
+    } catch(e) { links = []; }
+    render();
+  }
+
+  function extractLinks() {
+    const text = document.getElementById('msgInput').value.trim();
+    if (!text) { showToast('الصق رسالة أولاً!'); return; }
+    const regex = /https?:\/\/[^\s\)\]\}\,\"\'\<\>\u0600-\u06ff]+/g;
+    const found = [...new Set((text.match(regex) || []).map(u => u.replace(/[.,;:!?]+$/, '')))];
+    if (!found.length) { showToast('ما لقيت أي روابط في الرسالة'); return; }
+    const existing = new Set(links.map(l => l.url));
+    let added = 0;
+    found.forEach(url => {
+      if (!existing.has(url)) {
+        links.push({ url, used: false, id: Date.now() + Math.random() });
+        added++;
+      }
+    });
+    saveData(); render();
+    document.getElementById('msgInput').value = '';
+    showToast(added > 0 ? `✓ تم استخراج ${added} رابط` : 'الروابط موجودة مسبقاً');
+  }
+
+  function toggleUsed(id) {
+    const l = links.find(x => x.id === id);
+    if (l) { l.used = !l.used; saveData(); render(); }
+  }
+
+  function copyLink(id) {
+    const l = links.find(x => x.id === id);
+    if (!l) return;
+    const url = l.url;
+    const btn = document.getElementById('copy-btn-' + id);
+
+    const doSuccess = () => {
+      if (btn) {
+        btn.classList.add('copied');
+        btn.innerHTML = svgCheck() + ' تم النسخ';
+        setTimeout(() => {
+          btn.classList.remove('copied');
+          btn.innerHTML = svgCopy() + ' نسخ';
+        }, 2000);
+      }
+      showToast('✓ تم نسخ الرابط');
+    };
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(url).then(doSuccess).catch(() => fallbackCopy(url, doSuccess));
+    } else {
+      fallbackCopy(url, doSuccess);
+    }
+  }
+
+  function fallbackCopy(text, cb) {
+    const el = document.createElement('textarea');
+    el.value = text;
+    el.style.cssText = 'position:fixed;top:-9999px;left:-9999px;opacity:0;';
+    document.body.appendChild(el);
+    el.focus(); el.select();
+    try { document.execCommand('copy'); cb(); } catch(e) { showToast('فشل النسخ، حاول مرة ثانية'); }
+    document.body.removeChild(el);
+  }
+
+  function openLink(id) {
+    const l = links.find(x => x.id === id);
+    if (!l) return;
+    if (!l.used) { l.used = true; saveData(); render(); }
+    window.open(l.url, '_blank', 'noopener,noreferrer');
+  }
+
+  function deleteLink(id) {
+    links = links.filter(x => x.id !== id);
+    saveData(); render();
+    showToast('تم حذف الرابط');
+  }
+
+  function clearAll() {
+    if (!links.length) return;
+    if (confirm('هل تريد حذف جميع الروابط؟')) {
+      links = []; saveData(); render();
+    }
+  }
+
+  function getDomain(url) {
+    try { return new URL(url).hostname.replace(/^www\./, ''); } catch { return url.slice(0, 30); }
+  }
+
+  function getFaviconUrl(url) {
+    try {
+      const domain = new URL(url).hostname;
+      return `https://www.google.com/s2/favicons?domain=${encodeURIComponent(domain)}&sz=32`;
+    } catch { return null; }
+  }
+
+  function svgCopy() {
+    return `<svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>`;
+  }
+  function svgCheck() {
+    return `<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>`;
+  }
+  function svgOpen() {
+    return `<svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>`;
+  }
+  function svgCircle(filled) {
+    if (filled) return `<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5l-4-4 1.41-1.41L10 13.67l6.59-6.59L18 8.5l-8 8z"/></svg>`;
+    return `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg>`;
+  }
+
+  function render() {
+    const statsEl = document.getElementById('statsRow');
+    const listEl = document.getElementById('linksList');
+
+    if (!links.length) {
+      statsEl.style.display = 'none';
+      listEl.innerHTML = `<div class="empty-state">
+        <div class="empty-icon"><svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></div>
+        <h3>ما في روابط بعد</h3>
+        <p>الصق رسالتك بالأعلى وابدأ</p>
+      </div>`;
+      return;
+    }
+
+    const total = links.length;
+    const usedCount = links.filter(l => l.used).length;
+    statsEl.style.display = 'flex';
+    statsEl.innerHTML = `
+      <span class="stat-chip">المجموع: <b>${total}</b></span>
+      <span class="stat-chip green">مستخدم: <b>${usedCount}</b></span>
+      <span class="stat-chip">متبقي: <b>${total - usedCount}</b></span>
+    `;
+
+    listEl.innerHTML = links.map((l, i) => {
+      const domain = getDomain(l.url);
+      const favicon = getFaviconUrl(l.url);
+      const shortUrl = l.url.length > 55 ? l.url.slice(0, 55) + '…' : l.url;
+      const usedClass = l.used ? 'used' : '';
+      const eid = CSS.escape ? CSS.escape(String(l.id)) : String(l.id).replace(/\./g, '\\.');
+
+      const faviconHtml = favicon
+        ? `<div class="favicon-img" style="display:flex;align-items:center;justify-content:center;">
+             <img src="${favicon}" alt="" width="20" height="20" onerror="this.parentElement.style.display='none';this.parentElement.nextElementSibling&&(this.parentElement.nextElementSibling.style.display='none');this.closest('.favicon-wrap').querySelector('.link-default-icon').style.display='flex';">
+           </div>
+           <div class="check-icon"></div>
+           <div class="link-default-icon" style="display:none;align-items:center;justify-content:center;">
+             <svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+           </div>`
+        : `<div class="check-icon"></div>
+           <div class="link-default-icon" style="display:flex;align-items:center;justify-content:center;">
+             <svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+           </div>`;
+
+      return `<div class="link-card ${usedClass}" id="lc-${l.id}">
+        <div class="card-top">
+          <div class="favicon-wrap ${usedClass}" onclick="toggleUsed(${l.id})" title="${l.used ? 'إلغاء التحديد' : 'تحديد كمستخدم'}">
+            ${favicon
+              ? `<div class="favicon-img" style="display:flex;align-items:center;justify-content:center;"><img src="${favicon}" alt="" width="20" height="20" onerror="this.parentElement.style.display='none';this.closest('.favicon-wrap').querySelector('.link-default-icon').style.display='flex';"></div><div class="check-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="link-default-icon" style="display:none;align-items:center;justify-content:center;"><svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></div>`
+              : `<div class="check-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="link-default-icon" style="display:flex;align-items:center;justify-content:center;"><svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></div>`
+            }
+          </div>
+          <div class="link-info">
+            <div class="link-meta ${usedClass}">#${i + 1} · ${domain}${l.used ? ' · ✓ مستخدم' : ''}</div>
+            <div class="link-url-text ${usedClass}" title="${l.url}" dir="ltr">${shortUrl}</div>
+          </div>
+          <button class="btn-delete" onclick="deleteLink(${l.id})" title="حذف" aria-label="حذف">
+            <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+          </button>
+        </div>
+        <div class="card-actions">
+          <button class="action-btn" id="copy-btn-${l.id}" onclick="copyLink(${l.id})">
+            ${svgCopy()} نسخ
+          </button>
+          <button class="action-btn" onclick="openLink(${l.id})">
+            ${svgOpen()} فتح
+          </button>
+          <button class="action-btn mark-btn ${l.used ? 'active' : ''}" onclick="toggleUsed(${l.id})">
+            ${svgCircle(l.used)} ${l.used ? 'مستخدم' : 'تحديد كمستخدم'}
+          </button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  function showToast(msg) {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    if (toastTimer) clearTimeout(toastTimer);
+    el.classList.remove('show');
+    void el.offsetWidth;
+    el.classList.add('show');
+    toastTimer = setTimeout(() => el.classList.remove('show'), 2400);
+  }
+
+  document.getElementById('msgInput').addEventListener('keydown', function(e) {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') extractLinks();
+  });
+
+  loadData();
+</script>
+</body>
+</html>
